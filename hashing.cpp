@@ -1,7 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-
 bool is_prime(int n)
 {
   if (n < 2)
@@ -40,42 +39,84 @@ int prev_prime(int n)
 
   return 2;
 }
-
-unsigned long long hash1(const string &word)
+template <typename k>
+unsigned long long hash1(const k &word)
 {
-unsigned long long x = 6007;
-
-  for (auto& y : word)
+  if constexpr (is_same_v<k, string>)
   {
-    x = x * 31 + y;
-  }
+    unsigned long long x = 6007;
 
-  return x;
+    for (auto &y : word)
+    {
+      x = x * 31 + y;
+    }
+
+    return x;
+  }
+  else if constexpr (is_same_v<k, char>)
+  {
+    unsigned long long x = 6007;
+
+    x = x * 31 + word;
+
+    return x;
+  }
+  else
+    return word;
 }
-
-unsigned long long hash2(const string &word)
+template <typename k>
+unsigned long long hash2(const k &word)
 {
-unsigned long long x = 14695981039346656037ULL;
-
-  for (auto& y : word)
+  if constexpr (is_same_v<k, string>)
   {
-    x ^= y;
-   x *= 1099511628211ULL;
-  }
+    unsigned long long x = 14695981039346656037ULL;
 
-  return x;
+    for (auto &y : word)
+    {
+      x ^= y;
+      x *= 1099511628211ULL;
+    }
+
+    return x;
+  }
+  else if constexpr (is_same_v<k, char>)
+  {
+    unsigned long long x = 14695981039346656037ULL;
+
+    x ^= word;
+    x *= 1099511628211ULL;
+
+    return x;
+  }
+  else
+    return word * 1099511628211ULL;
 }
-
-unsigned long long aux_hash(const string &word)
+template <typename k>
+unsigned long long aux_hash(const k &word)
 {
-  unsigned long long x = 0;
-
-  for (auto& y : word)
+  if constexpr (is_same_v<k, string>)
   {
-    x = x * 211 + y + 1;
-  }
+    unsigned long long x = 0;
 
-  return x;
+    for (auto &y : word)
+    {
+      x = x * 211 + y + 1;
+    }
+
+    return x;
+  }
+  else if constexpr (is_same_v<k, char>)
+  {
+    unsigned long long x = 0;
+
+    x = x * 211 + word + 1;
+
+    return x;
+  }
+  else
+  {
+    return word * 211 + 1;
+  }
 }
 
 string ranword(int length, mt19937 &rng)
@@ -89,7 +130,6 @@ string ranword(int length, mt19937 &rng)
 
   return word;
 }
-
 
 template <typename K, typename V>
 class chain_tb
@@ -106,7 +146,7 @@ public:
 
   chain_tb(hf_type hf)
   {
-    this->hf =hf ;
+    this->hf = hf;
     ts = 13;
     cnt = 0;
     col = 0;
@@ -206,11 +246,10 @@ template <typename K, typename V>
 class open_addresstb
 {
 public:
-  using hf_type =unsigned long long (*)(const K &);
+  using hf_type = unsigned long long (*)(const K &);
 
   vector<pair<K, V>> tb;
 
-  
   vector<int> con;
 
   hf_type hf;
@@ -227,7 +266,7 @@ public:
     hf = h_f;
     aux_hf = auxhf;
 
-    ts =13;
+    ts = 13;
     ic = 0;
     col = 0;
 
@@ -246,7 +285,7 @@ public:
     if (way == "DOUBLE_HASHING")
       return (x + i * step) % ts;
 
-    return (x + i * step + 31 * i *i) % ts;
+    return (x + i * step + 31 * i * i) % ts;
   }
 
   void rehash(int ns)
@@ -265,9 +304,9 @@ public:
     {
       if (prev_con[i] == 1)
       {
-        for (int j= 0;j < ts;j++)
+        for (int j = 0; j < ts; j++)
         {
-          int index = getIndex(prev_tb[i].first,j);
+          int index = getIndex(prev_tb[i].first, j);
 
           if (con[index] == 0)
           {
@@ -462,5 +501,5 @@ int main()
        << avg_hit(cus1, w) << " "
        << cus2.col << " "
        << avg_hit(cus2, w) << endl;
-       return 0;
+  return 0;
 }
