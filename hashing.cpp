@@ -273,7 +273,18 @@ public:
     tb.resize(ts);
     con.resize(ts, 0);
   }
-
+  vector<int> ps(const K &key)
+  {
+    vector<int> s;
+    for (int i = 0; i < (int)ts; i++)
+    {
+      int index = getIndex(key, i);
+      s.push_back(index);
+      if ((con[index] == 1 && tb[index].first == key) || con[index] == 0)
+        break;
+    }
+    return s;
+  }
   int getIndex(const K &key, int i)
   {
     int x = hf(key) % ts;
@@ -304,6 +315,7 @@ public:
     {
       if (prev_con[i] == 1)
       {
+        bool placed = false;
         for (int j = 0; j < ts; j++)
         {
           int index = getIndex(prev_tb[i].first, j);
@@ -312,9 +324,12 @@ public:
           {
             tb[index] = prev_tb[i];
             con[index] = 1;
+            placed = true;
             break;
           }
         }
+        if (!placed)
+          cout << "Error" << endl;
       }
     }
   }
@@ -436,13 +451,12 @@ int main()
 {
   mt19937 rng(50);
   vector<string> w;
-  unordered_set<string> uw;
 
   while ((int)w.size() < 10000)
   {
     string x = ranword(10, rng);
 
-    if (uw.insert(x).second)
+    if (find(w.begin(), w.end(), x) == w.end())
       w.push_back(x);
   }
 
@@ -460,7 +474,6 @@ int main()
 
   open_addresstb<string, int> cus2(
       "CUSTOM_PROBING", hash2, aux_hash);
-
   for (int i = 0; i < 10000; i++)
   {
     c1.insert(w[i], i + 1);
@@ -501,5 +514,6 @@ int main()
        << avg_hit(cus1, w) << " "
        << cus2.col << " "
        << avg_hit(cus2, w) << endl;
+
   return 0;
 }
