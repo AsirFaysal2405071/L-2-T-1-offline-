@@ -104,20 +104,21 @@ int extract_min(vector<Node *> &v)
     }
     delete v[x->order];
     v[x->order] = nullptr;
-   consolidation(v, dh);
+    consolidation(v, dh);
     return val;
 }
-Node *find_in_tree(Node *root, int key)
+Node *search(Node *root, int val)
 {
     if (!root)
         return nullptr;
-    if (root->key == key)
+    if (root->key == val)
         return root;
 
-    for (Node *c : root->child)
+    for (auto x : root->child)
     {
-        if (Node *result = find_in_tree(c, key))
-            return result;
+        Node *r = search(x, val);
+        if (r)
+            return r;
     }
     return nullptr;
 }
@@ -126,7 +127,7 @@ Node *find(int key, vector<Node *> &heap)
 {
     for (Node *root : heap)
     {
-        if (Node *result = find_in_tree(root, key))
+        if (Node *result = search(root, key))
             return result;
     }
     return nullptr;
@@ -198,32 +199,27 @@ int count_nodes(Node *root)
 
 void print(Node *root)
 {
-    queue<Node *> q;
-    q.push(root);
+    if (!root)
+        return;
 
+    vector<Node *> current = {root};
     int level = 0;
 
-    while (!q.empty())
+    while (!current.empty())
     {
-        int nodes_at_level = q.size();
-
         cout << "Level " << level << ": ";
+        vector<Node *> next;
 
-        for (int i = 0; i < nodes_at_level; i++)
+        for (int i = 0; i < current.size(); i++)
         {
-            Node *current = q.front();
-            q.pop();
+            cout << (i ? " " : "") << current[i]->key;
 
-            cout << current->key;
-
-            if (i + 1 < nodes_at_level)
-                cout << " ";
-
-            for (Node *child : current->child)
-                q.push(child);
+            for (Node *child : current[i]->child)
+                next.push_back(child);
         }
 
         cout << endl;
+        current = next;
         level++;
     }
 }
@@ -252,6 +248,8 @@ void print_heap(vector<Node *> &heap, int x)
             print(heap[order]);
         }
     }
+    if(size==0)
+    cout<<"Heap H"<<x<<" is empty."<<endl;
 }
 
 void dn(Node *a, int x)
@@ -265,7 +263,7 @@ void dn(Node *a, int x)
     if (x > 0)
         cout << "|-- ";
 
-    cout << a->key <<endl;
+    cout << a->key << endl;
 
     for (Node *child : a->child)
         dn(child, x + 1);
@@ -280,12 +278,12 @@ void visu_heap(vector<Node *> &v, int x)
         return;
     }
     bool any = false;
-    for (int i = 0; i < v.size();i++)
+    for (int i = 0; i < v.size(); i++)
     {
         if (!v[i])
             continue;
         any = true;
-        cout << "Binomial Tree, B" <<i << '\n';
+        cout << "Binomial Tree, B" << i << '\n';
         dn(v[i], 0);
         cout << endl;
     }
@@ -304,7 +302,7 @@ void visu_consolidation(vector<Node *> &v1, vector<Node *> &v2, int x, int y)
 
     cout << endl
          << " After Union (result stored in H" << x << ")" << endl;
-   visu_heap(v1, x);
+    visu_heap(v1, x);
 }
 int main(int argc, char *argv[])
 {
@@ -389,29 +387,11 @@ int main(int argc, char *argv[])
         if (a == 'R')
         {
             int x, y;
-            cin >> x >> y;
+            fin >> x >> y;
             if (x == 1)
                 remove_key(y, h1);
             else
                 remove_key(y, h2);
-        }
-        if (a == 'V')
-        {
-            int x;
-            fin >> x;
-            if (x == 2)
-                visu_heap(h2, x);
-            else
-                visu_heap(h1, x);
-        }
-        if (a == 'W')
-        {
-            int x, y;
-            fin >> x >> y;
-            if (x == 1)
-                visu_consolidation(h1, h2, x, y);
-            else
-                 visu_consolidation(h2, h1, x, y);
         }
     }
     return 0;
